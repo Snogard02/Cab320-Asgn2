@@ -23,7 +23,7 @@ def my_team():
     
     '''
 #    return [ (1234567, 'Ada', 'Lovelace'), (1234568, 'Grace', 'Hopper'), (1234569, 'Eva', 'Tardos') ]
-    raise NotImplementedError()
+    #raise NotImplementedError()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -87,9 +87,14 @@ def split_dataset(x_input, y_input):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 def test_classifier(X_test, y_test, clf_nn, clf_svm, clf_nb):
-    print('Test accuracy for nn ­ > ', clf_nn.score(X_test,y_test))
-    print('test accuracy for svm ­> ', clf_svm.score(X_test,y_test))
-    print('test accuracy for nb  ­> ', clf_nb.score(X_test,y_test))
+    nn_score = clf_nn.score(X_test,y_test)
+    svm_score = clf_svm.score(X_test,y_test)
+    nb_score = clf_nb.score(X_test,y_test)
+    #Saves to file now, no need to print
+    #print('Test accuracy for nn ­ > ', nn_score)
+    #print('test accuracy for svm ­> ', svm_score)
+    #print('test accuracy for nb  ­> ', nb_score)
+    return nn_score, svm_score, nb_score
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 def build_NB_classifier(X_training, y_training):
@@ -161,12 +166,16 @@ def build_SVM_classifier(X_training, y_training):
 
 if __name__ == "__main__":
     pass
-    data = prepare_dataset("./medical_records.data")
-    [X_training, y_training, X_test, y_test] = split_dataset(data[0],data[1])
-
-    clf_nn = build_NN_classifier(X_training, y_training)
-    clf_svm = build_SVM_classifier(X_training, y_training)
-    clf_nb = build_NB_classifier(X_training,y_training)
-    test_classifier(X_test, y_test, clf_nn, clf_svm, clf_nb)
-
-
+    max_tests = 10
+    score_array = [0,0,0]
+    for i in range (0,max_tests):
+        data = prepare_dataset("./medical_records.data")
+        [X_training, y_training, X_test, y_test] = split_dataset(data[0],data[1])
+        clf_nn = build_NN_classifier(X_training, y_training)
+        clf_svm = build_SVM_classifier(X_training, y_training)
+        clf_nb = build_NB_classifier(X_training,y_training)
+        score_array = numpy.vstack((score_array,[test_classifier(X_test, y_test, clf_nn, clf_svm, clf_nb)]))
+#Save a array of the test results to a file called 'data'
+#Results saved in the format of [Nearest Neighbour,Support Machine Vector, Naive Bayes]
+    numpy.savetxt('data',score_array, fmt='%1.5f')
+    print('Done')
